@@ -1,7 +1,7 @@
 # Lua 深度入门：从 Java & Vue 开发者的思维模型迁移
 
 > **目标读者**：具备 Java 后端或 Vue/TypeScript 前端经验，零 Lua 基础的开发者
->  **核心目标**：建立 Lua 思维模型，理解底层机制，快速上手工程实践
+> **核心目标**：建立 Lua 思维模型，理解底层机制，快速上手工程实践
 
 ------
 
@@ -603,17 +603,17 @@ Lua 的 Table 是**唯一的复合数据结构**，统一扮演数组、字典�
 
 ```mermaid
 graph TB
-    subgraph "Lua Table 统一模型"
+    subgraph lua_table["Lua Table 统一模型"]
         T[Table]
-        T --> A["数组<br/>连续整数键 1,2,3..."]
-        T --> D["字典/Map<br/>任意键值对"]
-        T --> O["对象<br/>数据 + 方法"]
-        T --> M["模块/命名空间<br/>函数集合"]
-        T --> C["类<br/>元表 + 构造器"]
-        T --> S["集合 Set<br/>值作为键"]
+        T --> A["数组"]
+        T --> D["字典/Map"]
+        T --> O["对象"]
+        T --> M["模块"]
+        T --> C["类"]
+        T --> S["集合 Set"]
     end
     
-    subgraph "Java 对应结构"
+    subgraph java_struct["Java 对应结构"]
         JA[ArrayList]
         JM[HashMap]
         JO[Object Instance]
@@ -622,7 +622,7 @@ graph TB
         JS[HashSet]
     end
     
-    subgraph "JavaScript 对应结构"
+    subgraph js_struct["JavaScript 对应结构"]
         JSA[Array]
         JSO[Object]
         JSC[class / Prototype]
@@ -650,18 +650,21 @@ graph TB
 
 ```mermaid
 graph LR
-    subgraph "Table 内部结构"
+    subgraph table_internal["Table 内部结构"]
         T[Table Header]
-        T --> AP["数组部分 (Array Part)<br/>连续整数键 1..n<br/>O(1) 随机访问"]
-        T --> HP["哈希部分 (Hash Part)<br/>非整数键 + 稀疏整数键<br/>O(1) 平均查找"]
+        T --> AP["数组部分<br/>O1 随机访问"]
+        T --> HP["哈希部分<br/>O1 平均查找"]
     end
     
-    subgraph "示例: {10, 20, name='test', [100]=true}"
-        A1["[1] = 10"] --> AP2[数组部分]
-        A2["[2] = 20"] --> AP2
-        H1["['name'] = 'test'"] --> HP2[哈希部分]
-        H2["[100] = true"] --> HP2
+    subgraph example["示例"]
+        A1["1 = 10"] --> AP2[数组部分]
+        A2["2 = 20"] --> AP2
+        H1["name = test"] --> HP2[哈希部分]
+        H2["100 = true"] --> HP2
     end
+```
+
+```
 -- 高性能：连续整数键使用数组部分
 local dense = {}
 for i = 1, 100000 do
@@ -1059,17 +1062,20 @@ local t2 = setmetatable({}, {})  -- 返回第一个参数
 ```mermaid
 flowchart TD
     A["访问 t.key"] --> B{"t 中存在 key?"}
-    B -->|是| C["返回 t[key]"]
+    B -->|是| C["返回 t 的 key"]
     B -->|否| D{"t 有元表?"}
     D -->|否| E["返回 nil"]
-    D -->|是| F{"元表有 __index?"}
+    D -->|是| F{"元表有 index?"}
     F -->|否| E
-    F -->|是| G{"__index 类型?"}
-    G -->|Table| H["在 __index 表中查找<br/>递归此流程"]
-    G -->|Function| I["调用 __index(t, key)<br/>返回结果"]
+    F -->|是| G{"index 类型?"}
+    G -->|Table| H["在 index 表中查找<br/>递归此流程"]
+    G -->|Function| I["调用 index 函数<br/>返回结果"]
     H --> J["找到?"]
     J -->|是| K["返回值"]
     J -->|否| E
+```
+
+```
 -- __index 是 Table：实现继承
 local parent = {
     name = "parent",
@@ -1310,22 +1316,25 @@ print(rawequal(a, b))   -- false（直接引用比较）
 ```mermaid
 classDiagram
     class ClassMT["Class 元表"] {
-        __index: Class
-        __call: constructor
+        +__index : Class
+        +__call : constructor
     }
     class Class["Class Table"] {
-        new(): instance
-        method1()
-        method2()
+        +new() instance
+        +method1()
+        +method2()
     }
     class Instance["Instance Table"] {
-        field1
-        field2
+        +field1
+        +field2
     }
     
-    ClassMT --> Class : __call 调用 new
-    Class --> Instance : 创建
-    Instance --> Class : __index 查找方法
+    ClassMT --> Class : 通过 __call 调用 new
+    Class --> Instance : 创建实例
+    Instance --> Class : 通过 __index 查找方法
+```
+
+```
 -- 完整的类实现
 local Class = {}
 Class.__index = Class
@@ -1357,18 +1366,18 @@ print(Class.staticMethod())  -- "This is a static method"
 
 ```mermaid
 graph TB
-    subgraph "继承链"
-        Animal["Animal<br/>{speak, eat}"]
-        Dog["Dog<br/>{bark}"]
-        Cat["Cat<br/>{meow}"]
-        Bulldog["Bulldog<br/>{drool}"]
+    subgraph inheritance["继承链"]
+        Animal["Animal<br/>speak, eat"]
+        Dog["Dog<br/>bark"]
+        Cat["Cat<br/>meow"]
+        Bulldog["Bulldog<br/>drool"]
     end
     
-    Dog -->|"__index"| Animal
-    Cat -->|"__index"| Animal
-    Bulldog -->|"__index"| Dog
+    Dog -->|__index| Animal
+    Cat -->|__index| Animal
+    Bulldog -->|__index| Dog
     
-    subgraph "方法查找: bulldog:speak()"
+    subgraph lookup["方法查找: bulldog:speak()"]
         B1["bulldog 实例"] --> B2{"有 speak?"}
         B2 -->|否| B3["查找 Bulldog"]
         B3 --> B4{"有 speak?"}
@@ -1377,6 +1386,9 @@ graph TB
         B6 -->|否| B7["查找 Animal"]
         B7 --> B8["找到 speak"]
     end
+```
+
+```
 -- 基类
 local Animal = {}
 Animal.__index = Animal
@@ -1927,7 +1939,7 @@ print(mymodule.getCount())   -- 2
 
 ```mermaid
 flowchart TD
-    A["require('modname')"] --> B{"package.loaded[modname] 存在?"}
+    A["require modname"] --> B{"已缓存?"}
     B -->|是| C["返回缓存的模块"]
     B -->|否| D["搜索模块文件"]
     D --> E{"在 package.path 中找到?"}
@@ -1936,9 +1948,12 @@ flowchart TD
     G -->|是| H["作为 C 库加载"]
     G -->|否| I["抛出错误"]
     F --> J["执行模块代码"]
-    J --> K["将返回值存入 package.loaded"]
+    J --> K["存入 package.loaded"]
     K --> L["返回模块"]
     H --> K
+```
+
+```
 -- 查看搜索路径
 print(package.path)
 -- 典型输出：./?.lua;/usr/local/share/lua/5.4/?.lua;...
@@ -2089,28 +2104,25 @@ print(mylib.utils.helper())
 
 ```mermaid
 graph LR
-    subgraph "Java 抢占式线程"
-        JT1[Thread 1] --> |"OS 调度<br/>随时切换"| JT2[Thread 2]
-        JT2 --> |"OS 调度"| JT1
+    subgraph java["Java 抢占式线程"]
+        JT1[Thread 1] -->|OS调度| JT2[Thread 2]
+        JT2 -->|OS调度| JT1
         JS[JVM Scheduler] -.-> JT1
         JS -.-> JT2
-        note1["需要锁/同步<br/>有数据竞争风险"]
     end
     
-    subgraph "JS 事件循环"
+    subgraph js["JS 事件循环"]
         EL[Event Loop] --> CB1[Task 1]
-        CB1 --> |"完成后"| EL
+        CB1 -->|完成| EL
         EL --> CB2[Task 2]
-        CB2 --> |"完成后"| EL
-        note2["单线程<br/>异步非阻塞<br/>Promise/async"]
+        CB2 -->|完成| EL
     end
     
-    subgraph "Lua 协同式协程"
-        CO1[Coroutine 1] --> |"yield"| MAIN[主程序/调度器]
-        MAIN --> |"resume"| CO1
-        MAIN --> |"resume"| CO2[Coroutine 2]
-        CO2 --> |"yield"| MAIN
-        note3["单线程<br/>主动让出<br/>无数据竞争"]
+    subgraph lua["Lua 协同式协程"]
+        CO1[Coroutine 1] -->|yield| MAIN[主程序]
+        MAIN -->|resume| CO1
+        MAIN -->|resume| CO2[Coroutine 2]
+        CO2 -->|yield| MAIN
     end
 ```
 
@@ -2181,22 +2193,25 @@ sequenceDiagram
     participant Co as 协程
     
     Note over Main: 创建协程
-    Main->>Co: resume(co, arg1, arg2)
+    Main->>Co: resume co arg1 arg2
     activate Co
-    Note over Co: 首次 resume：<br/>参数传给协程函数
-    Note over Co: 执行到 yield(ret1, ret2)
-    Co-->>Main: 返回 (true, ret1, ret2)
+    Note over Co: 首次resume参数传给协程函数
+    Note over Co: 执行到 yield
+    Co-->>Main: 返回 true ret1 ret2
     deactivate Co
     
-    Note over Main: 继续执行...
+    Note over Main: 继续执行
     
-    Main->>Co: resume(co, val1, val2)
+    Main->>Co: resume co val1 val2
     activate Co
-    Note over Co: 后续 resume：<br/>参数作为 yield 的返回值
-    Note over Co: 执行到 return final1, final2
-    Co-->>Main: 返回 (true, final1, final2)
+    Note over Co: 后续resume参数作为yield返回值
+    Note over Co: 执行到 return
+    Co-->>Main: 返回 true final1 final2
     deactivate Co
-    Note over Co: 状态变为 "dead"
+    Note over Co: 状态变为 dead
+```
+
+```
 -- 完整的数据传递示例
 local co = coroutine.create(function(a, b)
     print("收到初始参数:", a, b)  -- 1, 2
