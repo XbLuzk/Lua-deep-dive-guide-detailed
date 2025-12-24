@@ -2,8 +2,8 @@
 
 > 帮助 Java 后端和 Vue/TypeScript 前端开发者零基础入门 Lua 语言
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Lua](https://img.shields.io/badge/Lua-5.4-blue.svg)](https://www.lua.org/)
+[![GitHub](https://img.shields.io/badge/GitHub-Lua--deep--dive--guide-blue.svg)](https://github.com/XbLuzk/Lua-deep-dive-guide-detailed)
 
 ## 📚 项目简介
 
@@ -206,9 +206,9 @@ ngx.say(cjson.encode({
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 开启 Pull Request
 
-## 📄 许可证
+## 📄 开源协议
 
-本项目采用 MIT 许可证。详见 [LICENSE](LICENSE) 文件。
+本项目为开源学习资源，欢迎自由使用和分享。
 
 ## 💬 反馈与支持
 
