@@ -1,9 +1,9 @@
 # Lua 深度入门：从 Java & Vue 开发者的思维模型迁移
 
-> **目标读者**：具备 Java 后端或 Vue/TypeScript 前端经验，零 Lua 基础的开发者
+> **目标读者**：具备 Java 后端或 Vue/TypeScript 前端经验，零 Lua 基础的开发者  
 > **核心目标**：建立 Lua 思维模型，理解底层机制，快速上手工程实践
 
-------
+---
 
 ## 1. 语言范式转换 (Paradigm Shift)
 
@@ -36,12 +36,18 @@ local b = 20
 -- 必须显式转换
 print(tonumber(a) + b)  -- 30
 print(a .. tostring(b)) -- "1020"
+```
+
+```javascript
 // 【JS】弱类型：隐式类型转换
 const a = "10";
 const b = 20;
 console.log(a + b);   // "1020"（字符串拼接）
 console.log(a - b);   // -10（隐式转为数字）
 console.log(a == 10); // true（类型转换后比较）
+```
+
+```java
 // 【Java】静态强类型：编译期检查
 String a = "10";
 int b = 20;
@@ -68,18 +74,24 @@ for i = 1, #arr do
     print(i, arr[i])
 end
 -- 输出：1 a, 2 b, 3 c
+```
+
+```java
 // 【Java】索引从 0 开始
 String[] arr = {"a", "b", "c"};
 System.out.println(arr[0]);  // 输出 "a"
 // arr[3] 会抛出 ArrayIndexOutOfBoundsException
+```
+
+```javascript
 // 【JS】索引从 0 开始
 const arr = ["a", "b", "c"];
 console.log(arr[0]);  // "a"
 console.log(arr[3]);  // undefined（不是错误）
 ```
 
-**设计考量**：源于 Lua 早期用户（非程序员的工程师）的使用习惯，与数学/工程领域一致。
- **痛点**：与 C/Java/JS 生态交互时需时刻注意边界转换。
+**设计考量**：源于 Lua 早期用户（非程序员的工程师）的使用习惯，与数学/工程领域一致。  
+**痛点**：与 C/Java/JS 生态交互时需时刻注意边界转换。
 
 **常见错误场景**：
 
@@ -113,8 +125,8 @@ print(count)  -- 10，全局变量在函数外可访问
 print(safe)   -- nil，局部变量已离开作用域
 ```
 
-**设计考量**：简化入门门槛，减少语法噪音。
- **最佳实践**：**始终使用 `local`**，必要时通过 linter 强制检查。
+**设计考量**：简化入门门槛，减少语法噪音。  
+**最佳实践**：**始终使用 `local`**，必要时通过 linter 强制检查。
 
 **全局变量的本质**：
 
@@ -161,6 +173,9 @@ if {} then print("empty table is truthy") end  -- 输出！
 
 if nil then print("nil") else print("nil is falsy") end    -- nil is falsy
 if false then print("false") else print("false is falsy") end  -- false is falsy
+```
+
+```javascript
 // 【JS】多种 falsy 值
 if (0) console.log("0");           // 不输出
 if ("") console.log("empty");      // 不输出
@@ -187,6 +202,9 @@ end
 if #str > 0 then
     print("字符串非空")
 end
+```
+
+```lua
 -- 【Lua】检查数字是否有效
 local num = 0
 if num then
@@ -263,6 +281,9 @@ do  -- do-end 创建新作用域
 end
 print(outer)  -- 可访问
 -- print(inner)  -- 错误！inner 已离开作用域
+```
+
+```lua
 -- 变量遮蔽（Shadowing）
 local x = 10
 do
@@ -400,7 +421,7 @@ print(20 >> 2) -- 5（右移）
 | 不等于     | `!=`         | `!==`          | `~=`  |
 | 逻辑非     | `!`          | `!`            | `not` |
 | 逻辑与     | `&&`         | `&&`           | `and` |
-| 逻辑或     | `||`         | `||`           | `or`  |
+| 逻辑或     | `\|\|`       | `\|\|`         | `or`  |
 | 字符串拼接 | `+`          | `+`            | `..`  |
 | 整数除法   | 整数/整数    | `Math.floor()` | `//`  |
 | 幂运算     | `Math.pow()` | `**`           | `^`   |
@@ -429,6 +450,9 @@ local handlers = {
 }
 local op = "add"
 local result = handlers[op](10, 5)  -- 15
+```
+
+```lua
 -- 数值 for 循环
 -- for var = start, stop [, step] do ... end
 -- 特点：包含 stop 值，step 默认为 1
@@ -451,6 +475,9 @@ for i = 1, 5 do
     i = i + 10  -- 这不会跳过迭代！
 end
 -- 输出：1, 2, 3, 4, 5
+```
+
+```lua
 -- 泛型 for 循环（迭代器模式）
 local arr = {"a", "b", "c"}
 
@@ -466,6 +493,9 @@ for key, value in pairs(mixed) do
     print(key, value)
 end
 -- 可能输出：1 10, 2 20, 3 30, name test（顺序不定）
+```
+
+```lua
 -- while 循环
 local i = 1
 while i <= 5 do
@@ -484,6 +514,9 @@ until j > 5  -- 条件为真时退出
 repeat
     local line = io.read()
 until line == "quit"  -- line 在此处可见
+```
+
+```lua
 -- break：退出当前循环
 for i = 1, 10 do
     if i > 5 then
@@ -538,6 +571,9 @@ fib = function(n)
     if n <= 2 then return 1 end
     return fib(n - 1) + fib(n - 2)
 end
+```
+
+```lua
 -- 多返回值（Lua 特色）
 local function minmax(...)
     local args = {...}
@@ -564,6 +600,9 @@ local t = {three()}          -- t={1, 2, 3}，全部收集
 print(three())               -- 1 2 3，全部打印
 print(three(), "end")        -- 1 end，只取第一个
 print("start", three())      -- start 1 2 3，最后位置取全部
+```
+
+```lua
 -- 变参函数
 local function printf(fmt, ...)
     print(string.format(fmt, ...))
@@ -580,6 +619,9 @@ local function varargs(...)
     print("从第2个开始:", select(2, ...))
 end
 varargs(1, nil, 3)  -- 参数个数: 3
+```
+
+```lua
 -- 具名参数模拟（使用 table）
 local function create_window(options)
     local title = options.title or "Untitled"
@@ -593,7 +635,7 @@ create_window{title = "My App", width = 1024}
 -- 等价于 create_window({title = "My App", width = 1024})
 ```
 
-------
+---
 
 ## 2. 核心容器：Table 的统一性与灵活性
 
@@ -664,7 +706,7 @@ graph LR
     end
 ```
 
-```
+```lua
 -- 高性能：连续整数键使用数组部分
 local dense = {}
 for i = 1, 100000 do
@@ -845,6 +887,9 @@ end
 for _, k in ipairs(to_remove) do
     data[k] = nil
 end
+```
+
+```lua
 -- 自定义迭代器
 local function range(start, stop, step)
     step = step or 1
@@ -1025,7 +1070,7 @@ deep.nested.value = 200
 print(original.nested.value)  -- 100（未受影响）
 ```
 
-------
+---
 
 ## 3. 进阶机制：元表 (Metatable) 与对象模型模拟
 
@@ -1075,7 +1120,7 @@ flowchart TD
     J -->|否| E
 ```
 
-```
+```lua
 -- __index 是 Table：实现继承
 local parent = {
     name = "parent",
@@ -1131,6 +1176,9 @@ validated.name = "Alice"  -- OK
 validated.age = 30        -- OK
 -- validated.age = -5     -- 错误！
 -- validated.age = "old"  -- 错误！
+```
+
+```lua
 -- 实现属性变更追踪
 local function observable(t)
     local proxy = {}
@@ -1276,7 +1324,7 @@ print(v1 == Vector.new(1, 2))  -- true
 | `__unm`      | `-a`                       | 取负                                         |
 | `__idiv`     | `a // b`                   | 整数除法（Lua 5.3+）                         |
 | `__band`     | `a & b`                    | 按位与（Lua 5.3+）                           |
-| `__bor`      | `a | b`                    | 按位或（Lua 5.3+）                           |
+| `__bor`      | `a \| b`                   | 按位或（Lua 5.3+）                           |
 | `__bxor`     | `a ~ b`                    | 按位异或（Lua 5.3+）                         |
 | `__bnot`     | `~a`                       | 按位取反（Lua 5.3+）                         |
 | `__shl`      | `a << b`                   | 左移（Lua 5.3+）                             |
@@ -1334,7 +1382,7 @@ classDiagram
     Instance --> Class : 通过 __index 查找方法
 ```
 
-```
+```lua
 -- 完整的类实现
 local Class = {}
 Class.__index = Class
@@ -1388,7 +1436,7 @@ graph TB
     end
 ```
 
-```
+```lua
 -- 基类
 local Animal = {}
 Animal.__index = Animal
@@ -1554,7 +1602,7 @@ print(alice:toJSON())  -- {"name":"Alice","age":"30"}
 print(alice > bob)     -- true（比较年龄）
 ```
 
-------
+---
 
 ## 4. 函数、闭包与模块化
 
@@ -1833,6 +1881,9 @@ for i = 1, 3 do
 end
 
 -- 现在正确输出：1, 2, 3
+```
+
+```javascript
 // 【JS】同样的问题
 var functions = [];
 for (var i = 1; i <= 3; i++) {
@@ -1924,6 +1975,9 @@ end
 
 -- 返回模块表
 return M
+```
+
+```lua
 -- main.lua
 local mymodule = require("mymodule")
 
@@ -1953,7 +2007,7 @@ flowchart TD
     H --> K
 ```
 
-```
+```lua
 -- 查看搜索路径
 print(package.path)
 -- 典型输出：./?.lua;/usr/local/share/lua/5.4/?.lua;...
@@ -2001,6 +2055,9 @@ return M
 -- 使用
 local math_utils = require("math_utils")
 print(math_utils.add(1, 2))
+```
+
+```javascript
 // 【JS ES Module】
 // math_utils.js
 export function add(a, b) {
@@ -2018,6 +2075,9 @@ console.log(add(1, 2));
 // 或
 import * as mathUtils from './math_utils.js';
 console.log(mathUtils.add(1, 2));
+```
+
+```javascript
 // 【JS CommonJS】
 // math_utils.js
 module.exports = {
@@ -2028,6 +2088,9 @@ module.exports = {
 // 使用
 const mathUtils = require('./math_utils');
 console.log(mathUtils.add(1, 2));
+```
+
+```java
 // 【Java】
 // MathUtils.java
 package com.example;
@@ -2077,6 +2140,9 @@ local cfg = require("config_module").init({
     port = 8080
 })
 print(cfg.get("host"))
+```
+
+```lua
 -- 子模块结构
 -- mylib/init.lua（或 mylib.lua）
 local M = {}
@@ -2096,7 +2162,7 @@ print(mylib.version())
 print(mylib.utils.helper())
 ```
 
-------
+---
 
 ## 5. 并发模型：协程 (Coroutine) 的协同式调度
 
@@ -2211,7 +2277,7 @@ sequenceDiagram
     Note over Co: 状态变为 dead
 ```
 
-```
+```lua
 -- 完整的数据传递示例
 local co = coroutine.create(function(a, b)
     print("收到初始参数:", a, b)  -- 1, 2
@@ -2487,6 +2553,9 @@ local function process_all()
         coroutine.resume(co)
     end
 end
+```
+
+```javascript
 // 【JS】async/await（语言原生支持）
 async function fetchData(url) {
     console.log("Fetching: " + url);
@@ -2510,7 +2579,7 @@ processAll().then(console.log);
 - Lua 协程是"假异步"（单线程同步），JS async/await 可以真正利用 IO 等待时间
 - 但在嵌入式环境（如 Redis、OpenResty），宿主会提供真正的异步调度
 
-------
+---
 
 ## 6. 错误处理与调试
 
@@ -2538,6 +2607,9 @@ print(ok, result)  -- false, "...Division by zero"
 local ok, result = pcall(function()
     return divide(10, 0)
 end)
+```
+
+```lua
 -- xpcall：带错误处理函数
 local function error_handler(err)
     print("Error caught:", err)
@@ -2553,6 +2625,9 @@ end
 local ok, result = xpcall(risky, error_handler)
 print("ok:", ok)
 print("result:", result)
+```
+
+```lua
 -- assert：条件检查
 local function load_config(filename)
     local file = io.open(filename, "r")
@@ -2666,6 +2741,9 @@ local function closure()
     end
 end
 closure()
+```
+
+```lua
 -- 简单的调试打印函数
 local function dump(value, indent)
     indent = indent or 0
@@ -2696,7 +2774,7 @@ local test = {
 dump(test)
 ```
 
-------
+---
 
 ## 7. 工程化实践与生态集成
 
@@ -2714,6 +2792,9 @@ public void incrementIfExists(Jedis jedis, String key) {
         // 问题：操作1和操作2之间可能被其他客户端修改
     }
 }
+```
+
+```lua
 -- 【Lua】Redis EVAL 原子脚本
 -- 整个脚本在 Redis 单线程中原子执行
 local key = KEYS[1]
@@ -2727,6 +2808,9 @@ if current then
 else
     return nil
 end
+```
+
+```java
 // 【Java 调用 Lua 脚本】
 String script = 
     "local key = KEYS[1]\n" +
@@ -2770,6 +2854,9 @@ if current > limit then
 else
     return 1  -- 允许访问
 end
+```
+
+```lua
 -- 分布式锁（带续期）
 -- KEYS[1]: 锁键
 -- ARGV[1]: 锁值（用于识别持有者）
@@ -3018,9 +3105,695 @@ local mylib = ffi.load("mylib")
 -- mylib.some_function()
 ```
 
-------
+---
 
-## 8. 附录
+## 8. C 与 Lua 互操作
+
+作为嵌入式脚本语言，Lua 的核心价值之一是与 C 的无缝互操作。本章从 Java 开发者熟悉的 JNI 视角出发，深入讲解 Lua C API 的核心机制。
+
+### 8.1 概述与 JNI 对比
+
+| 特性     | Java JNI                 | Lua C API                   |
+| -------- | ------------------------ | --------------------------- |
+| 复杂度   | 高（类型签名、引用管理） | 低（统一栈操作）            |
+| 数据交换 | 通过 JNI 函数转换        | 通过虚拟栈传递              |
+| 内存管理 | 需要管理局部/全局引用    | GC 自动管理（需注意栈平衡） |
+| 错误处理 | 异常机制                 | 保护调用 + 错误码           |
+| 性能开销 | 较高（跨越 JVM 边界）    | 较低（轻量级栈操作）        |
+
+### 8.2 虚拟栈：核心数据交换机制
+
+Lua 与 C 之间的所有数据交换都通过**虚拟栈**完成。理解栈操作是掌握 Lua C API 的关键。
+
+```mermaid
+graph TB
+    subgraph stack["Lua 虚拟栈"]
+        direction TB
+        TOP["栈顶 index -1"]
+        E4["元素 4"]
+        E3["元素 3"]
+        E2["元素 2"]
+        BOTTOM["栈底 index 1"]
+    end
+    
+    subgraph ops["C 操作"]
+        PUSH["lua_push 压入"]
+        GET["lua_to 读取"]
+        POP["lua_pop 弹出"]
+    end
+    
+    PUSH -->|压入新值| TOP
+    GET -->|读取值| E3
+    POP -->|移除| TOP
+```
+
+**索引规则**：
+
+- 正索引：从栈底向上，1 是栈底
+- 负索引：从栈顶向下，-1 是栈顶
+- 伪索引：访问注册表、上值等特殊位置
+
+
+栈索引示意图
+
+| 栈内容   | 正索引 | 负索引 |
+| -------- | ------ | ------ |
+| "top"    | 4      | -1     |
+| 3.14     | 3      | -2     |
+| 42       | 2      | -3     |
+| "bottom" | 1      | -4     |
+
+
+### 8.3 C 调用 Lua
+
+#### 初始化与基本操作
+
+```c
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
+int main(void) {
+    // 创建 Lua 状态机（类比 JVM 实例）
+    lua_State *L = luaL_newstate();
+    
+    // 加载标准库
+    luaL_openlibs(L);
+    
+    // 执行 Lua 代码字符串
+    luaL_dostring(L, "print('Hello from Lua!')");
+    
+    // 执行 Lua 文件
+    if (luaL_dofile(L, "script.lua") != LUA_OK) {
+        fprintf(stderr, "Error: %s\n", lua_tostring(L, -1));
+        lua_pop(L, 1);  // 弹出错误消息
+    }
+    
+    // 关闭状态机
+    lua_close(L);
+    return 0;
+}
+```
+
+**与 JNI 对比**：
+
+```c
+/* 【JNI】创建 JVM */
+JavaVM *jvm;
+JNIEnv *env;
+JNI_CreateJavaVM(&jvm, (void**)&env, &vm_args);
+
+/* 【Lua】创建状态机 */
+lua_State *L = luaL_newstate();
+// Lua 更简洁，无需复杂的参数配置
+```
+
+#### 栈操作函数
+
+```c
+// ========== 压栈函数 (C -> Lua) ==========
+lua_pushnil(L);                    // 压入 nil
+lua_pushboolean(L, 1);             // 压入 boolean
+lua_pushinteger(L, 42);            // 压入整数
+lua_pushnumber(L, 3.14);           // 压入浮点数
+lua_pushstring(L, "hello");        // 压入字符串（会复制）
+lua_pushlstring(L, buf, len);      // 压入指定长度的字符串
+lua_pushcfunction(L, my_cfunc);    // 压入 C 函数
+
+// ========== 读取函数 (Lua -> C) ==========
+int b = lua_toboolean(L, index);           // 读取 boolean
+lua_Integer i = lua_tointeger(L, index);   // 读取整数
+lua_Number n = lua_tonumber(L, index);     // 读取浮点数
+const char *s = lua_tostring(L, index);    // 读取字符串（不要保存指针！）
+size_t len;
+const char *s2 = lua_tolstring(L, index, &len);  // 读取字符串及长度
+
+// ========== 类型检查 ==========
+int type = lua_type(L, index);     // 返回 LUA_TNIL, LUA_TNUMBER 等
+const char *name = lua_typename(L, type);  // 类型名字符串
+int is_num = lua_isnumber(L, index);       // 是否可转为数字
+int is_str = lua_isstring(L, index);       // 是否可转为字符串
+
+// ========== 栈管理 ==========
+int top = lua_gettop(L);           // 获取栈顶索引（元素个数）
+lua_settop(L, n);                  // 设置栈顶（可用于扩展或截断）
+lua_pop(L, n);                     // 弹出 n 个元素，等价于 lua_settop(L, -n-1)
+lua_pushvalue(L, index);           // 复制指定索引的值到栈顶
+lua_remove(L, index);              // 移除指定索引的元素
+lua_insert(L, index);              // 将栈顶移动到指定索引
+lua_replace(L, index);             // 用栈顶替换指定索引（弹出栈顶）
+```
+
+#### 读取全局变量
+
+```c
+// Lua 脚本中定义：config = { host = "localhost", port = 8080 }
+
+// 读取简单全局变量
+lua_getglobal(L, "config");        // 压入 config 表
+if (lua_istable(L, -1)) {
+    // 读取 config.host
+    lua_getfield(L, -1, "host");   // 压入 config["host"]
+    const char *host = lua_tostring(L, -1);
+    printf("Host: %s\n", host);
+    lua_pop(L, 1);                 // 弹出 host
+    
+    // 读取 config.port
+    lua_getfield(L, -1, "port");
+    int port = lua_tointeger(L, -1);
+    printf("Port: %d\n", port);
+    lua_pop(L, 1);                 // 弹出 port
+}
+lua_pop(L, 1);                     // 弹出 config 表
+
+// 栈变化过程：
+// lua_getglobal:  [...] -> [..., config]
+// lua_getfield:   [..., config] -> [..., config, "localhost"]
+// lua_pop(1):     [..., config, "localhost"] -> [..., config]
+// lua_getfield:   [..., config] -> [..., config, 8080]
+// lua_pop(1):     [..., config, 8080] -> [..., config]
+// lua_pop(1):     [..., config] -> [...]
+```
+
+#### 调用 Lua 函数
+
+```c
+// Lua 脚本中定义：
+// function add(a, b)
+//     return a + b
+// end
+
+int call_lua_function(lua_State *L) {
+    // 获取函数
+    lua_getglobal(L, "add");       // 压入函数
+    
+    // 压入参数
+    lua_pushinteger(L, 10);        // 参数 1
+    lua_pushinteger(L, 20);        // 参数 2
+    
+    // 调用函数：2 个参数，1 个返回值
+    // lua_pcall 是保护调用，出错不会导致程序崩溃
+    if (lua_pcall(L, 2, 1, 0) != LUA_OK) {
+        fprintf(stderr, "Error: %s\n", lua_tostring(L, -1));
+        lua_pop(L, 1);
+        return -1;
+    }
+    
+    // 获取返回值
+    int result = lua_tointeger(L, -1);
+    lua_pop(L, 1);                 // 弹出返回值
+    
+    printf("Result: %d\n", result);  // 输出：Result: 30
+    return result;
+}
+
+// 栈变化过程：
+// lua_getglobal:  [...] -> [..., add]
+// lua_pushinteger: [..., add] -> [..., add, 10]
+// lua_pushinteger: [..., add, 10] -> [..., add, 10, 20]
+// lua_pcall:       [..., add, 10, 20] -> [..., 30]  (函数和参数被消耗)
+// lua_pop(1):      [..., 30] -> [...]
+```
+
+**与 JNI 调用 Java 方法对比**：
+
+```c
+/* 【JNI】调用 Java 方法 */
+jclass cls = (*env)->FindClass(env, "Calculator");
+jmethodID mid = (*env)->GetStaticMethodID(env, cls, "add", "(II)I");
+jint result = (*env)->CallStaticIntMethod(env, cls, mid, 10, 20);
+// 需要：查找类 -> 获取方法ID -> 指定签名 -> 调用
+
+/* 【Lua】调用函数 */
+lua_getglobal(L, "add");
+lua_pushinteger(L, 10);
+lua_pushinteger(L, 20);
+lua_pcall(L, 2, 1, 0);
+// 更简洁：获取函数 -> 压参数 -> 调用
+```
+
+#### 创建和操作 Table
+
+```c
+// 创建新表
+lua_newtable(L);                   // 创建空表并压栈
+
+// 设置字段（类似 t.name = "Lua"）
+lua_pushstring(L, "Lua");          // 压入值
+lua_setfield(L, -2, "name");       // t["name"] = 栈顶，弹出值
+
+// 设置数组元素（类似 t[1] = 100）
+lua_pushinteger(L, 100);
+lua_rawseti(L, -2, 1);             // t[1] = 栈顶，弹出值
+
+// 设置任意键值对
+lua_pushstring(L, "key");          // 压入键
+lua_pushstring(L, "value");        // 压入值
+lua_settable(L, -3);               // t[key] = value，弹出键和值
+
+// 遍历表
+lua_pushnil(L);                    // 第一个键
+while (lua_next(L, table_index) != 0) {
+    // 键在 -2，值在 -1
+    printf("Key: %s, Value: %s\n",
+           lua_typename(L, lua_type(L, -2)),
+           lua_typename(L, lua_type(L, -1)));
+    lua_pop(L, 1);                 // 弹出值，保留键供下次迭代
+}
+
+// 设置为全局变量
+lua_setglobal(L, "myTable");       // 弹出表，设置为全局变量 myTable
+```
+
+### 8.4 Lua 调用 C
+
+#### 注册 C 函数
+
+C 函数必须遵循特定签名：`int func(lua_State *L)`，返回值是返回给 Lua 的值的个数。
+
+```c
+// C 函数：计算两个数的和与差
+static int l_sum_diff(lua_State *L) {
+    // 检查参数
+    double a = luaL_checknumber(L, 1);  // 第一个参数
+    double b = luaL_checknumber(L, 2);  // 第二个参数
+    
+    // 压入返回值
+    lua_pushnumber(L, a + b);   // 第一个返回值：和
+    lua_pushnumber(L, a - b);   // 第二个返回值：差
+    
+    return 2;  // 返回 2 个值
+}
+
+// 注册为全局函数
+lua_pushcfunction(L, l_sum_diff);
+lua_setglobal(L, "sum_diff");
+
+// Lua 中使用：
+// local sum, diff = sum_diff(10, 3)
+// print(sum, diff)  -- 输出：13  7
+```
+
+#### 参数检查辅助函数
+
+```c
+// luaL_check* 系列：类型不匹配会抛出错误
+double n = luaL_checknumber(L, 1);        // 必须是数字
+lua_Integer i = luaL_checkinteger(L, 1);  // 必须是整数
+const char *s = luaL_checkstring(L, 1);   // 必须是字符串
+luaL_checktype(L, 1, LUA_TTABLE);         // 必须是表
+
+// luaL_opt* 系列：可选参数，提供默认值
+double n = luaL_optnumber(L, 2, 0.0);     // 第2个参数，默认 0.0
+const char *s = luaL_optstring(L, 3, "default");
+
+// 参数个数检查
+int nargs = lua_gettop(L);                // 获取参数个数
+luaL_argcheck(L, n > 0, 1, "must be positive");  // 条件检查
+```
+
+#### 创建 C 模块
+
+```c
+// mymath.c - 一个简单的数学模块
+
+#include <lua.h>
+#include <lauxlib.h>
+#include <math.h>
+
+// 计算圆面积
+static int l_circle_area(lua_State *L) {
+    double r = luaL_checknumber(L, 1);
+    lua_pushnumber(L, 3.14159265358979 * r * r);
+    return 1;
+}
+
+// 计算阶乘
+static int l_factorial(lua_State *L) {
+    int n = luaL_checkinteger(L, 1);
+    luaL_argcheck(L, n >= 0, 1, "must be non-negative");
+    
+    lua_Integer result = 1;
+    for (int i = 2; i <= n; i++) {
+        result *= i;
+    }
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+// 模块函数注册表
+static const luaL_Reg mymath_funcs[] = {
+    {"circle_area", l_circle_area},
+    {"factorial", l_factorial},
+    {NULL, NULL}  // 哨兵，标记结束
+};
+
+// 模块入口函数（必须命名为 luaopen_<模块名>）
+int luaopen_mymath(lua_State *L) {
+    luaL_newlib(L, mymath_funcs);  // 创建模块表并注册函数
+    return 1;  // 返回模块表
+}
+```
+
+**编译为动态库**：
+
+```bash
+# Linux
+gcc -shared -fPIC -o mymath.so mymath.c -I/usr/include/lua5.4
+
+# macOS
+gcc -bundle -undefined dynamic_lookup -o mymath.so mymath.c -I/usr/local/include/lua
+
+# Windows (MinGW)
+gcc -shared -o mymath.dll mymath.c -I/path/to/lua/include -L/path/to/lua -llua54
+```
+
+**Lua 中使用**：
+
+```lua
+local mymath = require("mymath")
+
+print(mymath.circle_area(5))   -- 78.539816...
+print(mymath.factorial(10))    -- 3628800
+```
+
+### 8.5 Userdata：封装 C 数据结构
+
+Userdata 允许将 C 数据结构暴露给 Lua，类似 JNI 中的 jobject 引用。
+
+```c
+// 定义 C 结构体
+typedef struct {
+    double x;
+    double y;
+} Point;
+
+// 元表名称（用于类型检查）
+#define POINT_MT "Point"
+
+// 创建 Point
+static int l_point_new(lua_State *L) {
+    double x = luaL_optnumber(L, 1, 0.0);
+    double y = luaL_optnumber(L, 2, 0.0);
+    
+    // 分配 userdata（由 Lua GC 管理）
+    Point *p = (Point *)lua_newuserdata(L, sizeof(Point));
+    p->x = x;
+    p->y = y;
+    
+    // 设置元表（用于方法调用和类型识别）
+    luaL_getmetatable(L, POINT_MT);
+    lua_setmetatable(L, -2);
+    
+    return 1;  // 返回 userdata
+}
+
+// 获取 Point（带类型检查）
+static Point *check_point(lua_State *L, int index) {
+    return (Point *)luaL_checkudata(L, index, POINT_MT);
+}
+
+// Point:distance() 方法
+static int l_point_distance(lua_State *L) {
+    Point *p = check_point(L, 1);
+    double dist = sqrt(p->x * p->x + p->y * p->y);
+    lua_pushnumber(L, dist);
+    return 1;
+}
+
+// Point:move(dx, dy) 方法
+static int l_point_move(lua_State *L) {
+    Point *p = check_point(L, 1);
+    double dx = luaL_checknumber(L, 2);
+    double dy = luaL_checknumber(L, 3);
+    p->x += dx;
+    p->y += dy;
+    lua_pushvalue(L, 1);  // 返回 self，支持链式调用
+    return 1;
+}
+
+// __tostring 元方法
+static int l_point_tostring(lua_State *L) {
+    Point *p = check_point(L, 1);
+    lua_pushfstring(L, "Point(%.2f, %.2f)", p->x, p->y);
+    return 1;
+}
+
+// __add 元方法：Point + Point
+static int l_point_add(lua_State *L) {
+    Point *p1 = check_point(L, 1);
+    Point *p2 = check_point(L, 2);
+    
+    Point *result = (Point *)lua_newuserdata(L, sizeof(Point));
+    result->x = p1->x + p2->x;
+    result->y = p1->y + p2->y;
+    
+    luaL_getmetatable(L, POINT_MT);
+    lua_setmetatable(L, -2);
+    
+    return 1;
+}
+
+// 模块方法
+static const luaL_Reg point_methods[] = {
+    {"distance", l_point_distance},
+    {"move", l_point_move},
+    {NULL, NULL}
+};
+
+// 元方法
+static const luaL_Reg point_meta[] = {
+    {"__tostring", l_point_tostring},
+    {"__add", l_point_add},
+    {NULL, NULL}
+};
+
+// 模块函数
+static const luaL_Reg point_funcs[] = {
+    {"new", l_point_new},
+    {NULL, NULL}
+};
+
+// 模块入口
+int luaopen_point(lua_State *L) {
+    // 创建元表
+    luaL_newmetatable(L, POINT_MT);
+    
+    // 设置 __index 指向自身（方法查找）
+    lua_pushvalue(L, -1);
+    lua_setfield(L, -2, "__index");
+    
+    // 注册方法到元表
+    luaL_setfuncs(L, point_methods, 0);
+    
+    // 注册元方法
+    luaL_setfuncs(L, point_meta, 0);
+    
+    // 创建模块表
+    luaL_newlib(L, point_funcs);
+    
+    return 1;
+}
+```
+
+**Lua 中使用**：
+
+```lua
+local Point = require("point")
+
+local p1 = Point.new(3, 4)
+print(p1)                    -- Point(3.00, 4.00)
+print(p1:distance())         -- 5.0
+
+local p2 = Point.new(1, 2)
+local p3 = p1 + p2           -- 使用 __add 元方法
+print(p3)                    -- Point(4.00, 6.00)
+
+p1:move(10, 10):move(5, 5)   -- 链式调用
+print(p1)                    -- Point(18.00, 19.00)
+```
+
+### 8.6 错误处理
+
+```c
+// 方法1：lua_pcall 保护调用
+if (lua_pcall(L, nargs, nresults, 0) != LUA_OK) {
+    const char *err = lua_tostring(L, -1);
+    fprintf(stderr, "Lua error: %s\n", err);
+    lua_pop(L, 1);
+    // 处理错误...
+}
+
+// 方法2：设置错误处理函数
+int traceback(lua_State *L) {
+    const char *msg = lua_tostring(L, 1);
+    luaL_traceback(L, L, msg, 1);  // 添加栈回溯
+    return 1;
+}
+
+// 使用错误处理函数
+lua_pushcfunction(L, traceback);   // 压入错误处理函数
+int errfunc = lua_gettop(L);       // 记录位置
+lua_getglobal(L, "my_function");
+// ... 压入参数 ...
+if (lua_pcall(L, nargs, nresults, errfunc) != LUA_OK) {
+    // 错误消息已包含栈回溯
+}
+
+// 方法3：在 C 函数中抛出错误
+static int l_my_func(lua_State *L) {
+    if (some_error_condition) {
+        return luaL_error(L, "Error: %s at line %d", msg, line);
+    }
+    // ...
+}
+
+// 方法4：参数检查抛出错误
+double n = luaL_checknumber(L, 1);  // 类型不匹配自动抛错
+luaL_argcheck(L, n > 0, 1, "must be positive");  // 条件检查
+```
+
+### 8.7 完整示例：嵌入 Lua 脚本引擎
+
+```c
+// embed_example.c - 完整的嵌入示例
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+
+// 注册给 Lua 的 C 函数：打印带前缀的消息
+static int l_log(lua_State *L) {
+    const char *level = luaL_checkstring(L, 1);
+    const char *msg = luaL_checkstring(L, 2);
+    printf("[%s] %s\n", level, msg);
+    return 0;
+}
+
+// 错误处理函数
+static int traceback(lua_State *L) {
+    const char *msg = lua_tostring(L, 1);
+    if (msg == NULL) {
+        if (luaL_callmeta(L, 1, "__tostring") && lua_type(L, -1) == LUA_TSTRING) {
+            return 1;
+        } else {
+            msg = lua_pushfstring(L, "(error object is a %s value)", 
+                                  luaL_typename(L, 1));
+        }
+    }
+    luaL_traceback(L, L, msg, 1);
+    return 1;
+}
+
+// 保护调用 Lua 函数
+static int pcall_with_traceback(lua_State *L, int nargs, int nresults) {
+    int errfunc = lua_gettop(L) - nargs;
+    lua_pushcfunction(L, traceback);
+    lua_insert(L, errfunc);
+    int status = lua_pcall(L, nargs, nresults, errfunc);
+    lua_remove(L, errfunc);
+    return status;
+}
+
+int main(int argc, char *argv[]) {
+    // 创建 Lua 状态机
+    lua_State *L = luaL_newstate();
+    if (L == NULL) {
+        fprintf(stderr, "Cannot create Lua state\n");
+        return 1;
+    }
+    
+    // 加载标准库
+    luaL_openlibs(L);
+    
+    // 注册 C 函数
+    lua_pushcfunction(L, l_log);
+    lua_setglobal(L, "log");
+    
+    // 设置全局配置
+    lua_newtable(L);
+    lua_pushstring(L, "1.0.0");
+    lua_setfield(L, -2, "version");
+    lua_pushboolean(L, 1);
+    lua_setfield(L, -2, "debug");
+    lua_setglobal(L, "APP");
+    
+    // 加载并执行脚本
+    const char *script = 
+        "log('INFO', 'Application started')\n"
+        "log('DEBUG', 'Version: ' .. APP.version)\n"
+        "\n"
+        "function process(data)\n"
+        "    if APP.debug then\n"
+        "        log('DEBUG', 'Processing: ' .. data)\n"
+        "    end\n"
+        "    return string.upper(data)\n"
+        "end\n";
+    
+    if (luaL_dostring(L, script) != LUA_OK) {
+        fprintf(stderr, "Script error: %s\n", lua_tostring(L, -1));
+        lua_close(L);
+        return 1;
+    }
+    
+    // 调用 Lua 函数
+    lua_getglobal(L, "process");
+    lua_pushstring(L, "hello world");
+    
+    if (pcall_with_traceback(L, 1, 1) != LUA_OK) {
+        fprintf(stderr, "Call error: %s\n", lua_tostring(L, -1));
+        lua_pop(L, 1);
+    } else {
+        const char *result = lua_tostring(L, -1);
+        printf("Result: %s\n", result);  // HELLO WORLD
+        lua_pop(L, 1);
+    }
+    
+    lua_close(L);
+    return 0;
+}
+```
+
+**编译和运行**：
+
+```bash
+gcc -o embed_example embed_example.c -I/usr/include/lua5.4 -llua5.4
+./embed_example
+
+# 输出：
+# [INFO] Application started
+# [DEBUG] Version: 1.0.0
+# [DEBUG] Processing: hello world
+# Result: HELLO WORLD
+```
+
+### 8.8 API 速查表
+
+| 函数                       | 作用            | 栈变化               |
+| -------------------------- | --------------- | -------------------- |
+| `lua_push*`                | 压入值          | +1                   |
+| `lua_pop(L, n)`            | 弹出 n 个值     | -n                   |
+| `lua_gettop(L)`            | 获取栈大小      | 0                    |
+| `lua_settop(L, n)`         | 设置栈大小      | ±?                   |
+| `lua_getglobal(L, name)`   | 获取全局变量    | +1                   |
+| `lua_setglobal(L, name)`   | 设置全局变量    | -1                   |
+| `lua_getfield(L, idx, k)`  | 获取 t[k]       | +1                   |
+| `lua_setfield(L, idx, k)`  | 设置 t[k]       | -1                   |
+| `lua_gettable(L, idx)`     | 获取 t[栈顶]    | 0 (消耗键，压入值)   |
+| `lua_settable(L, idx)`     | 设置 t[key]=val | -2                   |
+| `lua_newtable(L)`          | 创建空表        | +1                   |
+| `lua_newuserdata(L, size)` | 创建 userdata   | +1                   |
+| `lua_pcall(L, n, r, e)`    | 保护调用        | -(n+1)+r 或 +1(错误) |
+| `lua_call(L, n, r)`        | 非保护调用      | -(n+1)+r             |
+| `luaL_checktype(L, n, t)`  | 检查类型        | 0                    |
+| `luaL_check*`              | 检查并返回参数  | 0                    |
+| `luaL_error(L, fmt, ...)`  | 抛出错误        | 不返回               |
+
+---
+
+## 9. 附录
 
 ### 8.1 快速对照表
 
@@ -3032,7 +3805,7 @@ local mylib = ffi.load("mylib")
 | 不等于     | `!=`                  | `!==`                | `~=`             |
 | 逻辑非     | `!`                   | `!`                  | `not`            |
 | 逻辑与     | `&&`                  | `&&`                 | `and`            |
-| 逻辑或     | `||`                  | `||`                 | `or`             |
+| 逻辑或     | `\|\|`                | `\|\|`               | `or`             |
 | 数组长度   | `.length` / `.size()` | `.length`            | `#table`         |
 | 整数除法   | `/`（整数间）         | `Math.floor()`       | `//`             |
 | 幂运算     | `Math.pow()`          | `**`                 | `^`              |
